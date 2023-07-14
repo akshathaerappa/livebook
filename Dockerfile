@@ -1,4 +1,4 @@
-ARG BASE_IMAGE
+ARG BASE_IMAGE="elixir:latest"
 
 # Stage 1
 # Builds the Livebook release
