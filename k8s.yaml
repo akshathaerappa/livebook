@@ -1,0 +1,55 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: livebook
+  name: livebook-svc
+  namespace: test
+spec:
+  type: ClusterIP
+  ports:
+  - name: livebook
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: livebook
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livebook
+  namespace: test
+  labels:
+    app: livebook
+spec:
+  selector:
+      matchLabels:
+        app.kubernetes.io/name: livebook
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: livebook
+        app: livebook
+    spec:
+     containers:
+        - name: livebook
+          image: REGISTRY/OWNER/IMAGE_NAME:IMAGE_TAG
+          ports:
+            - containerPort: 8080
+          env:
+            - name: LIVEBOOK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: livebook-password
+                  key: password
+     imagePullSecrets:
+       - name: regcred3          
+---
